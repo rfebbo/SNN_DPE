@@ -3,8 +3,7 @@
     1. for each sample in the dataset
         - [feed sample into SNN with encoders and simulate for some time (sim_time)](./demonstration/03_running_network.ipynb)
         - [find steady state](./demonstration/04_steady_state.ipynb)
-        - convert spikes of every neuron into an spikes over the seady state time (Fire Matrix)
-        - Average Fire Matrix along the time axis (x) and do Mat Mul with DPE weights (y)
+        - find the average neuron fire rates over the steady state (x) and do Mat Mul with DPE weights (y)
         - [train DPE layer with Gradient Descent](./demonstration/05_weight_update.ipynb)
     1. Final accuracy (trainability of SNN) can be used as the fitness of generated SNN
     1. number of output neurons required can also be used as the fitness of generated SNN (would require multiple DPEs per SNN to be tested (should be fast))
