@@ -15,12 +15,8 @@ def forward_pass(fire_matrix, dpe_weights):
     y = np.zeros(n_classes)
 
     fire_matrix = np.asarray(fire_matrix)
-    x = np.zeros(n_neurons)
-
-    for t in range(len(fire_matrix)):
-        x += fire_matrix[t]
-
-    x /= steady_state_t
+    
+    x = np.mean(fire_matrix, axis=0)
 
     y += np.dot(x, dpe_weights)
 

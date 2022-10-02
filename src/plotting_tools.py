@@ -39,20 +39,24 @@ def plot_fire_matrix(fire_matrix):
     for i in range(n_neurons):
         f = fire_matrix[:, i]
         new_f = np.where(np.asarray(f) > 0)[0]
-        # print(f)
-        # print(new_f)
-        # break
         ax.scatter(new_f, np.ones(len(new_f)) * i, marker='|')
 
     ax.set_ylim(-0.5, n_neurons - 0.5)
     ax.set_yticks(ticks=range(n_neurons), labels=range(n_neurons))
     ax.tick_params(axis='both', labelsize=20)
     ax.set_ylabel('neuron ID', fontsize=20)
-    ax.set_title('neuron spikes', fontsize=20)
+    ax.set_title('Fire Matrix', fontsize=20)
     ax.set_xlabel('Time (ms)', fontsize=20)
 
     # plt.savefig('Images/Network_output_w_early_stop.pdf')
     plt.show()
+
+    x = np.mean(fire_matrix, axis=0)
+
+    print('avg neuron fire rates (x):')
+    for i, x_i in zip(reversed(range(n_neurons)),reversed(x)):
+        print(f'neruon {i}: {x_i}')
+
 
 
 def plot_spikes(fires, attributes, einputs, sim_time):
