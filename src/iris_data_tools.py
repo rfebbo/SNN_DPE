@@ -1,7 +1,7 @@
 import numpy as np
 
 # read in the Iris data, can be a subset where the data is limited to 2 classes and 2 attributes
-def read_iris_data(filepath, subset=False):
+def read_iris_data(filepath, subset=False, shuffle=False):
     classes = { 'Iris-setosa' : 0,
                 'Iris-versicolor' : 1,
                 'Iris-virginica' : 2
@@ -29,8 +29,15 @@ def read_iris_data(filepath, subset=False):
                 labels.append(classes[d[-1]])
                 iris_data.append(d[0:4])
 
+
     iris_data = np.asarray(iris_data, np.float32)
     labels = np.asarray(labels, np.int32)
+
+    if shuffle:
+        p = np.random.permutation(len(iris_data))
+        iris_data = iris_data[p]
+        labels = labels[p]
+    
 
     return iris_data, labels, classes, attributes
 
