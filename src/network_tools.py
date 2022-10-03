@@ -21,7 +21,7 @@ def create_network(n_neurons, n_synapses, negative_weights = False, threshold_ra
         n2 = Neurons[n2_id]
 
         # positive weights only (should we keep it like that?)
-        weight = np.random.rand(1) * weight_factor
+        weight = np.random.rand(1)[0] * weight_factor
 
         if negative_weights:
             weight -= weight_factor/2
@@ -145,32 +145,72 @@ def run_network_early_exit(neurons, encoders, enc_input, sim_time, window_size=1
 
     return np.asarray(fire_matrix)
 
-def save_trained_network(filename, neurons, encoders, dpe_weights, window_size, c_acc, E_t, avg_ss):
-    n_neurons = len(neurons)
-
+def save_trained_network(filename, neurons, encoders, dpe_weights, window_size, sim_time, c_acc, E_t, avg_ss):
     network = {}
 
-    network['neurons'] = {}
-    network['encoders'] = {}
-    network['dpe_weights'] = dpe_weights
+    network['neurons'] = []
+    network['synapses'] = []
+    network['encoders'] = []
+    network['dpe_weights'] = list(dpe_weights.flatten())
     network['window_size'] = window_size
+    network['sim_time'] = sim_time
     network['cumulative accuracy'] = c_acc
     network['Epoch Accuracy'] = E_t
     network['Average Steady State Time'] = avg_ss
 
     for n in neurons:
-        network['neurons'][n.id] = {}
-        network['neurons'][n.id]['synapses'] = []
-        network['neurons'][n.id]['leak'] = n.leak
-        network['neurons'][n.id]['threshold'] = n.threshold
+        saved_n = {}
+        saved_n['leak'] = n.leak
+        saved_n['threshold'] = n.threshold
+        network['neurons'].append(saved_n)
 
         for s in n.synapses:
-            syn = {}
-            syn['n1'] = s.n1
-            syn['n2'] = s.n2
-            syn['weight'] = s.weight
-            network['neurons'][n.id]['synapses'].append(syn)
+            saved_s = {}
+            saved_s['n1'] = s.n1.id
+            saved_s['n2'] = s.n2.id
+            saved_s['weight'] = s.weight
+
+            network['synapses'].append(saved_s)
 
     for i, e in enumerate(encoders):
-        network['encoders'][i] = {}
-        network['encoders'][i] = {}
+        saved_e = {}
+        saved_e['min_f'] = e.min_f
+        saved_e['max_f'] = e.max_f
+        saved_e['sim_f'] = e.sim_f
+        network['encoders'].append(saved_e)
+
+    with open(filename, 'w') as f:
+        f.write(json.dumps(network))
+
+def load_trained_network(filename):
+    network = {}
+    with open(filename, 'r') as f:
+        network = json.load(f)
+
+    neurons = []
+    encoders = []
+    dpe_weights = np.asarray(network['dpe_weights']).reshape((len(network['neurons']), -1))
+    window_size = network['window_size']
+    sim_time = network['sim_time']
+    c_acc = network['cumulative accuracy']
+    E_t = network['Epoch Accuracy']
+    avg_ss = network['Average Steady State Time']
+
+    for i, n in enumerate(network['neurons']):
+        loaded_n = Neuron(i, n['threshold'], n['leak'])
+        neurons.append(loaded_n)
+
+    for s in network['synapses']:
+        n1 = neurons[s['n1']]
+        n2 = neurons[s['n2']]
+        loaded_s = Synapse(n1, n2, s['weight'])
+
+        neurons[s['n1']].add_synapse(loaded_s)
+
+    for e in network['encoders']:
+        loaded_e = Encoder(e['min_f'], e['max_f'], e['sim_f'])
+        encoders.append(loaded_e)
+
+    
+    return neurons, encoders, dpe_weights, window_size, sim_time, c_acc, E_t, avg_ss
+
