@@ -139,8 +139,6 @@ def run_network_early_exit(neurons, encoders, enc_input, sim_time, window_size=1
             m1 = np.mean(total_fires[-window_size*2:-window_size])
             m2 = np.mean(total_fires[-window_size:])
             if np.isclose(m1, m2):
-                # print(f'steady state at {t}')
-                steady_state_t = t
                 break
 
     return np.asarray(fire_matrix)
