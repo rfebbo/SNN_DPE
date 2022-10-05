@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
 from network_tools import run_network_early_exit, reset_network
 from training_tools import forward_pass

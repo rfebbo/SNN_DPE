@@ -1,6 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
-
 from network_tools import reset_network, run_network_early_exit
 
 def mse(y, y_hat):
@@ -8,18 +6,8 @@ def mse(y, y_hat):
 
 # find the average spiking rate of each neuron (x) and multiply it with the dpe weights
 def forward_pass(fire_matrix, dpe_weights):
-    steady_state_t = len(fire_matrix)
-    n_neurons = len(fire_matrix[0])
-    n_classes = dpe_weights.shape[1]
-
-    y = np.zeros(n_classes)
-
-    fire_matrix = np.asarray(fire_matrix)
-    
     x = np.mean(fire_matrix, axis=0)
-
-    y += np.dot(x, dpe_weights)
-
+    y = np.dot(x, dpe_weights)
     return x, y
 
 def update_weights(fire_matrix, dpe_weights, x, y, y_hat, lr=0.005):
@@ -32,19 +20,18 @@ def update_weights(fire_matrix, dpe_weights, x, y, y_hat, lr=0.005):
         for j in range(n_classes):
             dpe_weights[i][j] -= e[j] * x[i] * lr
 
-def train_all(data, labels, classes, neurons, encoders, dpe_weights, sim_time = 200, window_size=5, n_epochs=10):
+def train_all(data, labels, classes, neurons, encoders, dpe_weights, sim_time = 200, window_size=10, n_epochs=10):
     E_t = []
     cumulative_acc = []
     avg_steady_state_t = 0
     n_proccessed = 0
     
-    for epoch in range(n_epochs):
+    for _ in range(n_epochs):
         # for sample in data
-        E = 0
         n_correct = 0
         for i, d in enumerate(data):
             # run network
-            fire_matrix = run_network_early_exit(neurons, encoders, d, sim_time)
+            fire_matrix = run_network_early_exit(neurons, encoders, d, sim_time, window_size=window_size)
 
             reset_network(neurons, encoders)
 
@@ -73,7 +60,5 @@ def train_all(data, labels, classes, neurons, encoders, dpe_weights, sim_time = 
             n_proccessed += 1
                 
         E_t.append(float(n_correct)/len(data))
-
-            
 
     return E_t, avg_steady_state_t, cumulative_acc
