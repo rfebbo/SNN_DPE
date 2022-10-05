@@ -13,3 +13,6 @@
 - Future Idea
     1. Generate multiple SNNs and have one DPE for each of them
     1. train the DPEs like above, and use the collection of SNNs as a genome for EO
+
+- ToDo
+    1. investigate unsupervised approach
