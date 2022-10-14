@@ -14,5 +14,8 @@
     1. Generate multiple SNNs and have one DPE for each of them
     1. train the DPEs like above, and use the collection of SNNs as a genome for EO
 
+- Future Idea
+    1. Use multiple DPE, SNN outputs as lists of guesses like in Thousand Brains
+
 - ToDo
     1. investigate unsupervised approach
