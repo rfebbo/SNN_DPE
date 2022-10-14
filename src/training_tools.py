@@ -29,7 +29,7 @@ def train_all(data, labels, classes, neurons, encoders, dpe_weights, sim_time = 
     for _ in range(n_epochs):
         # for sample in data
         n_correct = 0
-        for i, d in enumerate(data):
+        for l, d in zip(labels, data):
             # run network
             fire_matrix = run_network_early_exit(neurons, encoders, d, sim_time, window_size=window_size)
 
@@ -40,12 +40,12 @@ def train_all(data, labels, classes, neurons, encoders, dpe_weights, sim_time = 
             x, y = forward_pass(fire_matrix, dpe_weights)
 
             y_hat = np.zeros(len(classes))
-            y_hat[labels[i]] = 1
+            y_hat[l] = 1
 
             update_weights(fire_matrix, dpe_weights, x, y, y_hat)
             
             correct = 0
-            if np.argmax(y) == labels[i]:
+            if np.argmax(y) == l:
                 n_correct += 1
                 correct = 1
 
