@@ -4,18 +4,13 @@ class Neuron:
         self.membrane_voltage = 0
         self.threshold = threshold
         self.leak = leak
-        self.incoming_potential = 0
         self.synapses = []
 
     # accumulate then spike
     def update(self):
-        self.membrane_voltage += self.incoming_potential
-        
         if self.membrane_voltage < 0:
             self.membrane_voltage = 0
-        
-        self.incoming_potential = 0
-
+    
         if self.membrane_voltage > self.threshold:
             self.spike()
             self.membrane_voltage = 0
@@ -30,13 +25,12 @@ class Neuron:
             s.send_spike()
 
     def apply_potential(self, potential):
-        self.incoming_potential += potential
+        self.membrane_voltage += potential
 
     def add_synapse(self, synapse):
         self.synapses.append(synapse)
 
     def reset(self):
-        self.incoming_potential = 0
         self.membrane_voltage = 0
 
 class Synapse:

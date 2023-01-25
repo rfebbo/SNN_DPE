@@ -1,8 +1,9 @@
-import numpy as np
 import json
 
-from neuron_synapse import Neuron, Synapse
-from encoder import Encoder
+import numpy as np
+
+from snn_dpe import Encoder, Neuron, Synapse
+
 
 def create_network(n_neurons, n_synapses, negative_weights = False, threshold_range = (0.35, 0.55), leak_range = (0.05, 0.25), weight_factor = 1.8):
     Neurons = []
@@ -33,10 +34,10 @@ def create_network(n_neurons, n_synapses, negative_weights = False, threshold_ra
     return Neurons
 
 # create a network with encoders and feed it a sample from the dataset
-def create_encoders(attributes, min_f = 10, max_f = 700, sim_f = 1000):
+def create_encoders(n_enc, min_f = 10, max_f = 700, sim_f = 1000, enc_type = 'period'):
     encoders = []
-    for i, a in attributes.items():
-        e = Encoder(min_f, max_f, sim_f)
+    for _ in range(n_enc):
+        e = Encoder(min_f, max_f, sim_f, enc_type)
         encoders.append(e)
 
     return encoders
@@ -100,7 +101,7 @@ def find_steady_state(sim_time, attributes, fires, window_size=10):
         if t > window_size*2:
             m1 = np.mean(total_fires[-window_size*2:-window_size])
             m2 = np.mean(total_fires[-window_size:])
-            if np.isclose(m1, m2):
+            if np.isclose(m1, m2) and m1 != 0:
                 # print(f'steady state at {t}')
                 steady_state_t = t
                 break
@@ -138,7 +139,7 @@ def run_network_early_exit(neurons, encoders, enc_input, sim_time, window_size=1
         if t > window_size*2:
             m1 = np.mean(total_fires[-window_size*2:-window_size])
             m2 = np.mean(total_fires[-window_size:])
-            if np.isclose(m1, m2):
+            if np.isclose(m1, m2) and m1 != 0:
                 break
 
     return np.asarray(fire_matrix)
@@ -175,6 +176,7 @@ def save_trained_network(filename, neurons, encoders, dpe_weights, window_size, 
         saved_e['min_f'] = e.min_f
         saved_e['max_f'] = e.max_f
         saved_e['sim_f'] = e.sim_f
+        saved_e['enc_type'] = e.enc_type
         network['encoders'].append(saved_e)
 
     with open(filename, 'w') as f:

@@ -1,5 +1,6 @@
 import numpy as np
 
+
 # read in the Iris data, can be a subset where the data is limited to 2 classes and 2 attributes
 def read_iris_data(filepath, subset=False, shuffle=False):
     classes = { 'Iris-setosa' : 0,
@@ -7,16 +8,16 @@ def read_iris_data(filepath, subset=False, shuffle=False):
                 'Iris-virginica' : 2
                 }
 
-    attributes = {  0 : 'Sepal Length', 
-                    1 : 'Sepal Width',
-                    2 : 'Petal Length',
-                    3 : 'Petal Width'
-                    }
+    attributes = ['Sepal Length', 
+                    'Sepal Width',
+                    'Petal Length',
+                    'Petal Width'
+    ]
 
     if subset:
         classes.pop('Iris-virginica')
-        attributes.pop(2)
-        attributes.pop(3)
+        attributes.remove('Petal Length')
+        attributes.remove('Petal Width')
 
     iris_data = []
     labels = []
@@ -45,7 +46,7 @@ def read_iris_data(filepath, subset=False, shuffle=False):
 def normalize_iris_data(iris_data, attributes):
 
     normalized_iris_data = []
-    for i, a in attributes.items():
+    for i in range(len(attributes)):
         dmin = np.min(iris_data[:, i])
         
         dmax = np.max(iris_data[:, i])

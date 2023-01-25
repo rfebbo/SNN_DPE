@@ -1,5 +1,7 @@
 import numpy as np
-from network_tools import reset_network, run_network_early_exit
+
+from snn_dpe.tools.network import reset_network, run_network_early_exit
+
 
 def mse(y, y_hat):
     return np.sum((y - y_hat)**2)
@@ -11,12 +13,12 @@ def forward_pass(fire_matrix, dpe_weights):
     return x, y
 
 def update_weights(fire_matrix, dpe_weights, x, y, y_hat, lr=0.005):
-    n_neurons = len(fire_matrix[0])
+    # n_neurons = len(x)
     n_classes = dpe_weights.shape[1]
 
     e = 2 * (y - y_hat)
 
-    for i in range(n_neurons):
+    for i in range(len(x)):
         for j in range(n_classes):
             dpe_weights[i][j] -= e[j] * x[i] * lr
 

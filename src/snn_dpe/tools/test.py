@@ -1,7 +1,7 @@
 import numpy as np
 
-from network_tools import run_network_early_exit, reset_network
-from training_tools import forward_pass
+from snn_dpe.tools.network import reset_network, run_network_early_exit
+from snn_dpe.tools.train import forward_pass
 
 
 def predict(neurons, encoders, dpe_weights, sample, sim_time=100, window_size=10):

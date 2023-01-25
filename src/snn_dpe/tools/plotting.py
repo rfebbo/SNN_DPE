@@ -42,6 +42,7 @@ def plot_fire_matrix(fire_matrix):
         ax.scatter(new_f, np.ones(len(new_f)) * i, marker='|')
 
     ax.set_ylim(-0.5, n_neurons - 0.5)
+    ax.set_xlim(0, len(fire_matrix))
     ax.set_yticks(ticks=range(n_neurons), labels=range(n_neurons))
     ax.tick_params(axis='both', labelsize=20)
     ax.set_ylabel('neuron ID', fontsize=20)
@@ -55,7 +56,7 @@ def plot_fire_matrix(fire_matrix):
 
     print('avg neuron fire rates (x):')
     for i, x_i in zip(reversed(range(n_neurons)),reversed(x)):
-        print(f'neruon {i}: {x_i}')
+        print(f'neuron {i}: {x_i}')
 
 
 
@@ -66,18 +67,18 @@ def plot_spikes(fires, attributes, einputs, sim_time):
 
     for i, f in enumerate(fires):
         # plot encoders on separate axis
-        if i < len(attributes):
+        if i < len(einputs):
             ax[0].scatter(f, np.ones(len(f)) * i, marker='|')
         else:
             ax[1].scatter(f, np.ones(len(f)) * (i - len(attributes)), marker='|')
 
     enc_labels = []
-    for v, ei in zip(attributes.values(), einputs):
+    for v, ei in zip(attributes, einputs):
         enc_labels.append(f'{v} ({ei:.2f})')
 
     ax[0].set_ylim(-0.5, len(attributes) - 0.5)
     ax[0].set_yticks(ticks=range(len(attributes)), labels=enc_labels)
-    ax[0].tick_params(axis='both', labelsize=20)
+    ax[0].tick_params(axis='both', labelsize=15)
     ax[0].set_title('encoder spikes', fontsize=20)
 
     ax[1].set_ylim(-0.5, n_neurons - 0.5)
@@ -116,7 +117,7 @@ def plot_acc(E_t, c_acc):
     fig = plt.subplots(figsize=(8,5))
     plt.plot(range(n_iter_per_epoch, len(c_acc)+1, n_iter_per_epoch), E_t, label='Post Epoch')
     plt.plot(range(len(c_acc)), c_acc, label='Cumulative')
-    plt.xticks(ticks=range(0, 11*n_iter_per_epoch, n_iter_per_epoch), labels=range(0, 11, 1))
+    plt.xticks(ticks=range(0, (len(E_t) + 1)*n_iter_per_epoch, n_iter_per_epoch), labels=range(0, len(E_t) + 1, 1))
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy')
     plt.title('Accuracy')
