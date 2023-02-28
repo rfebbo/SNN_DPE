@@ -31,7 +31,7 @@ def plot_iris_data(data, classes, attributes, labels):
         ax_i.set_ylabel(attributes[2*i+1])
         ax_i.legend()
 
-def plot_fire_matrix(fire_matrix):
+def plot_fire_matrix(fire_matrix, print_rates = False):
     n_neurons = len(fire_matrix[0])
 
     fig, ax = plt.subplots(figsize=(10,5))
@@ -43,10 +43,10 @@ def plot_fire_matrix(fire_matrix):
 
     ax.set_ylim(-0.5, n_neurons - 0.5)
     ax.set_xlim(0, len(fire_matrix))
-    ax.set_yticks(ticks=range(n_neurons), labels=range(n_neurons))
+    ax.set_yticks(ticks=range(0, n_neurons+1, int(n_neurons/10)), labels=range(0, n_neurons+1, int(n_neurons/10)))
     ax.tick_params(axis='both', labelsize=20)
     ax.set_ylabel('neuron ID', fontsize=20)
-    ax.set_title('Fire Matrix', fontsize=20)
+    ax.set_title('Spike Raster', fontsize=20)
     ax.set_xlabel('Time (ms)', fontsize=20)
 
     # plt.savefig('Images/Network_output_w_early_stop.pdf')
@@ -54,9 +54,10 @@ def plot_fire_matrix(fire_matrix):
 
     x = np.mean(fire_matrix, axis=0)
 
-    print('avg neuron fire rates (x):')
-    for i, x_i in zip(reversed(range(n_neurons)),reversed(x)):
-        print(f'neuron {i}: {x_i}')
+    if print_rates:
+        print('avg neuron fire rates (x):')
+        for i, x_i in zip(reversed(range(n_neurons)),reversed(x)):
+            print(f'neuron {i}: {x_i}')
 
 
 
