@@ -171,13 +171,14 @@ def save_trained_network(filename, neurons, encoders, dpe_weights, window_size, 
 
             network['synapses'].append(saved_s)
 
-    for i, e in enumerate(encoders):
-        saved_e = {}
-        saved_e['min_f'] = e.min_f
-        saved_e['max_f'] = e.max_f
-        saved_e['sim_f'] = e.sim_f
-        saved_e['enc_type'] = e.enc_type
-        network['encoders'].append(saved_e)
+    if encoders is not None:
+        for i, e in enumerate(encoders):
+            saved_e = {}
+            saved_e['min_f'] = e.min_f
+            saved_e['max_f'] = e.max_f
+            saved_e['sim_f'] = e.sim_f
+            saved_e['enc_type'] = e.enc_type
+            network['encoders'].append(saved_e)
 
     with open(filename, 'w') as f:
         f.write(json.dumps(network))
