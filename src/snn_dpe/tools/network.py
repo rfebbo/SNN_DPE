@@ -215,3 +215,30 @@ def load_trained_network(filename):
     
     return neurons, encoders, dpe_weights, window_size, sim_time, c_acc, E_t, avg_ss
 
+# simulates a network with timeseries data, at each timestep the first n_input neurons receive potentiation in the form of the data
+# NOTE: the input neurons are divided evenly into two types. The first get the data normally and the second get an inverted version of the data. 
+#   This is done so that the spike raster is not empty in the sections where input is low
+# returns - spike raster where the rows correspond to a neuron and each column is a timestep. 
+#   If the neuron fired at that timestep there is a 1 otherwise there is a 0
+def run_network_timeseries(neurons, data, n_input):
+    # simulate
+    spike_raster = []
+    for i in range(len(data)):
+        spike_raster.append([])
+
+    # feed a peice of data in at each timestep
+    for t in range(len(data)):
+        # get the input for this timestep, and apply it to input neurons
+        for i in range(int(n_input/2)): #normal
+            neurons[i].apply_potential(data[t])
+        for i in range(int(n_input/2)): #inverted
+            neurons[i+int(n_input/2)].apply_potential(-data[t]+1)
+
+        # update the network
+        for n in neurons:
+            if n.update():
+                spike_raster[t].append(1)
+            else:
+                spike_raster[t].append(0)
+
+    return np.asarray(spike_raster)
