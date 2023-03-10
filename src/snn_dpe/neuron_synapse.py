@@ -32,10 +32,12 @@ class Neuron:
     def add_synapse(self, synapse):
         self.synapses.append(synapse)
 
-    def reset(self):
+    def reset(self, reset_synapses=True):
         self.membrane_voltage = 0
-        for s in self.synapses:
-            s.weight = s.start_weight
+
+        if reset_synapses:
+            for s in self.synapses:
+                s.weight = s.start_weight
 
 class Synapse:
     def __init__(self, n1, n2, weight, std_dev = 0, drift = 0):
