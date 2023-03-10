@@ -77,7 +77,7 @@ def train_all(data, labels, classes, neurons, encoders, dpe_weights, sim_time = 
     return E_t, avg_steady_state_t, cumulative_acc
 
 # uses io pairs and an SNN to train a dpe layer
-def train_TS(n_epochs, TS_inputs, TS_outputs, neurons, n_input, write_noise_std = 0, silent=True, TS_inputs_te = None, TS_outputs_te = None, initial_weights = None, initial_bias = None, relative=False):
+def train_TS(n_epochs, TS_inputs, TS_outputs, neurons, n_input, write_noise_std = 0, silent=True, TS_inputs_te = None, TS_outputs_te = None, initial_weights = None, initial_bias = None, relative=False, post_sample_reset=True, reset_synapses=True, post_epoch_reset=False):
     if initial_weights == None or initial_bias == None:
         dpe_weights = np.random.rand(len(neurons), len(TS_outputs[0]))
         dpe_bias = np.random.rand(len(TS_outputs[0]))
@@ -107,8 +107,10 @@ def train_TS(n_epochs, TS_inputs, TS_outputs, neurons, n_input, write_noise_std 
 
             # run the network and get the spike raster
             spike_raster = run_network_timeseries(neurons, input_i, n_input)
-            for n in neurons:
-                n.reset()
+            
+            if post_sample_reset:
+                for n in neurons:
+                    n.reset(reset_synapses)
 
             # use the spike raster as an input for the dpe and calculate the result
             x, y = forward_pass(spike_raster, dpe_weights, bias=dpe_bias)
@@ -137,6 +139,11 @@ def train_TS(n_epochs, TS_inputs, TS_outputs, neurons, n_input, write_noise_std 
             n_processed += 1
             pbar.set_description(f"Training MSE: {mse_avg:.4}, Testing MSE: {Testing_mses[-1]:.4}")
 
+
+        if post_epoch_reset:
+            for n in neurons:
+                n.reset(reset_synapses)
+
         Training_mses.append(mse_avg)
         if TS_inputs_te is not None:
             Testing_mse = test_timeseries(TS_inputs_te, TS_outputs_te, neurons, dpe_weights, n_input, bias=dpe_bias, plot_len=0, relative=relative)
@@ -161,7 +168,7 @@ def predict(neurons, encoders, dpe_weights, sample, sim_time=100, window_size=10
 
 
 # takes inputs of specific window size and calculates outputs for testing then plots if plt_len > 0
-def test_timeseries(TS_inputs, TS_outputs, neurons, dpe_weights, n_input, stride=1, TS_data = None, bias = None, relative=False, plot_len = 200):
+def test_timeseries(TS_inputs, TS_outputs, neurons, dpe_weights, n_input, stride=1, TS_data = None, bias = None, relative=False, plot_len = 200, post_sample_reset=True, reset_synapses=True):
     
     warmup = len(TS_inputs[0])
     testing_mse = 0
@@ -175,8 +182,9 @@ def test_timeseries(TS_inputs, TS_outputs, neurons, dpe_weights, n_input, stride
 
         spike_raster = run_network_timeseries(neurons, input_sample, n_input)
 
-        for n in neurons:
-            n.reset()
+        if post_sample_reset:
+            for n in neurons:
+                n.reset(reset_synapses)
 
         _, y = forward_pass(spike_raster, dpe_weights, bias=bias)
 
