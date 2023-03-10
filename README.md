@@ -1,7 +1,9 @@
-Installation:
+# Installation:
 cd src
+
 pip install --editable .
 
+# Extra
 
 * [Training / EO idea](./demonstration/06_training_test.ipynb)
     1. [Generate a random SNN](./demonstration/02_network_creation.ipynb)

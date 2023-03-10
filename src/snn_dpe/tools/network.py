@@ -5,7 +5,7 @@ import numpy as np
 from snn_dpe import Encoder, Neuron, Synapse
 
 
-def create_network(n_neurons, n_synapses, negative_weights = False, threshold_range = (0.35, 0.55), leak_range = (0.05, 0.25), weight_factor = 1.8):
+def create_network(n_neurons, n_synapses, negative_weights = False, threshold_range = (0.35, 0.55), leak_range = (0.05, 0.25), weight_factor = 1.8, std_dev=0, drift=0):
     Neurons = []
 
     for i in range(n_neurons):
@@ -21,13 +21,13 @@ def create_network(n_neurons, n_synapses, negative_weights = False, threshold_ra
         n1 = Neurons[n1_id]
         n2 = Neurons[n2_id]
 
-        # positive weights only (should we keep it like that?)
+        
         weight = np.random.rand(1)[0] * weight_factor
 
         if negative_weights:
             weight -= weight_factor/2
 
-        s = Synapse(n1, n2, weight)
+        s = Synapse(n1, n2, weight, std_dev, drift)
 
         Neurons[n1_id].add_synapse(s)
 

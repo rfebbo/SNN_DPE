@@ -1,3 +1,5 @@
+import numpy as np
+
 class Neuron:
     def __init__(self, id, threshold, leak):
         self.id = id
@@ -34,10 +36,13 @@ class Neuron:
         self.membrane_voltage = 0
 
 class Synapse:
-    def __init__(self, n1, n2, weight):
+    def __init__(self, n1, n2, weight, std_dev = 0, drift = 0):
         self.n1 = n1
         self.n2 = n2
         self.weight = weight
+        self.std_dev = std_dev
+        self.drift = drift
 
     def send_spike(self):
-        self.n2.apply_potential(self.weight)
+        self.weight += self.weight*self.drift
+        self.n2.apply_potential(np.random.normal(self.weight, self.std_dev))
