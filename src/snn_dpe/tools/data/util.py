@@ -2,7 +2,7 @@ import numpy as np
 
 
 # This takes timeseries data and splits it into input and output pairs for training
-def generate_io_pairs(timeseries_data, input_window_size, output_window_size, stride = 1):
+def generate_io_pairs(timeseries_data, input_window_size, output_window_size, stride = 1, shuffle=False):
     TS_inputs = []
     TS_outputs = []
 
@@ -14,5 +14,12 @@ def generate_io_pairs(timeseries_data, input_window_size, output_window_size, st
 
         TS_inputs.append(input_i)
         TS_outputs.append(output_i)
+
+    if shuffle:
+        # probably unnecessary shuffle
+        p = np.random.permutation(len(TS_inputs))
+        TS_inputs = TS_inputs[p]
+        TS_outputs = TS_outputs[p]
+
 
     return np.asarray(TS_inputs),np.asarray(TS_outputs)

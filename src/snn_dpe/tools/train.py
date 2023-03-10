@@ -4,6 +4,8 @@ from tqdm import tqdm
 from snn_dpe.tools.network import (reset_network, run_network_early_exit,
                                    run_network_timeseries)
 
+import matplotlib.pyplot as plt
+
 def mse(y, y_hat):
     return np.sum((y - y_hat)**2)
 
@@ -76,7 +78,7 @@ def train_all(data, labels, classes, neurons, encoders, dpe_weights, sim_time = 
 
 # uses io pairs and an SNN to train a dpe layer
 def train_TS(n_epochs, TS_inputs, TS_outputs, neurons, n_input, write_noise_std = 0, silent=True, TS_inputs_te = None, TS_outputs_te = None, initial_weights = None, initial_bias = None, relative=False):
-    if initial_weights == None:
+    if initial_weights == None or initial_bias == None:
         dpe_weights = np.random.rand(len(neurons), len(TS_outputs[0]))
         dpe_bias = np.random.rand(len(TS_outputs[0]))
 
@@ -119,9 +121,10 @@ def train_TS(n_epochs, TS_inputs, TS_outputs, neurons, n_input, write_noise_std 
             # use gradient descent to update the weights
             update_weights(dpe_weights, x, y, desired_output, bias=dpe_bias)
 
-            
-            dpe_weights += np.random.choice([-1,1], dpe_weights.shape)*dpe_weights*write_noise_std
-            dpe_bias += np.random.choice([-1,1], dpe_bias.shape)*dpe_bias*write_noise_std
+            dpe_weights += np.random.normal(0, write_noise_std, size=dpe_weights.shape)            
+            dpe_bias += np.random.normal(0, write_noise_std, size=dpe_bias.shape)            
+            # dpe_weights += np.random.choice([-1,1], dpe_weights.shape)*dpe_weights*write_noise_std
+            # dpe_bias += np.random.choice([-1,1], dpe_bias.shape)*dpe_bias*write_noise_std
 
             # calculate cumulative average mse
             if mse_avg == 0:

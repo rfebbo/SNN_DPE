@@ -1,3 +1,8 @@
+Installation:
+cd src
+pip install --editable .
+
+
 * [Training / EO idea](./demonstration/06_training_test.ipynb)
     1. [Generate a random SNN](./demonstration/02_network_creation.ipynb)
     1. for each sample in the dataset
@@ -17,5 +22,11 @@
 - Future Idea
     1. Use multiple DPE, SNN outputs as lists of guesses like in Thousand Brains
 
+- Future Idea
+    1. use single encoder with attributes passed in at different times
+
 - ToDo
     1. investigate unsupervised approach
+
+- Notes
+    1. In unshuffled dataset, accuracy is artificially high during training(ie. network learns weights that can switch between classes quickly)
