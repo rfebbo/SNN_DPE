@@ -34,11 +34,14 @@ class Neuron:
 
     def reset(self):
         self.membrane_voltage = 0
+        for s in self.synapses:
+            s.weight = s.start_weight
 
 class Synapse:
     def __init__(self, n1, n2, weight, std_dev = 0, drift = 0):
         self.n1 = n1
         self.n2 = n2
+        self.start_weight = weight
         self.weight = weight
         self.std_dev = std_dev
         self.drift = drift
