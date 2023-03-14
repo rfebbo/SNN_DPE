@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class Neuron:
     def __init__(self, id, threshold, leak, spike_event=0):
         self.id = id

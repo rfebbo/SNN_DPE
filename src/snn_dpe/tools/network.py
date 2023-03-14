@@ -34,7 +34,7 @@ def create_network(n_neurons, n_synapses, negative_weights = False, threshold_ra
     return Neurons
 
 # create a network with encoders and feed it a sample from the dataset
-def create_encoders(n_enc, min_f = 10, max_f = 700, sim_f = 1000, enc_type = 'period'):
+def create_encoders(n_enc, min_f = 10, max_f = 700, sim_f = 1000, enc_type = 'rate'):
     encoders = []
     for _ in range(n_enc):
         e = Encoder(min_f, max_f, sim_f, enc_type)

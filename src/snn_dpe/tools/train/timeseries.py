@@ -1,80 +1,10 @@
+import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
 
-from snn_dpe.tools.network import (reset_network, run_network_early_exit,
-                                   run_network_timeseries)
+from snn_dpe.tools.network import run_network_timeseries
+from snn_dpe.tools.train.utils import forward_pass, mse, rmse, update_weights
 
-import matplotlib.pyplot as plt
-
-def mse(y, y_hat):
-    return np.sum((y - y_hat)**2)
-
-# find the average spiking rate of each neuron (x) and multiply it with the dpe weights
-def forward_pass(fire_matrix, dpe_weights, bias=None):
-    x = np.mean(fire_matrix, axis=0)
-    y = np.dot(x, dpe_weights)
-    # y = np.sum(y, axis=0)
-
-    if bias:
-        return x, y + bias
-    else:
-        return x, y
-
-def update_weights(dpe_weights, x, y, y_hat, lr=0.005, bias=None):
-    n_classes = dpe_weights.shape[1]
-
-    e = 2 * (y - y_hat)
-
-    if bias:
-        bias -= np.sum(e) * lr
-
-    for i in range(len(x)):
-        for j in range(n_classes):
-            dpe_weights[i][j] -= e[j] * x[i] * lr
-
-
-def train_all(data, labels, classes, neurons, encoders, dpe_weights, sim_time = 200, window_size=10, n_epochs=10):
-    E_t = []
-    cumulative_acc = []
-    avg_steady_state_t = 0
-    n_proccessed = 0
-    
-    for _ in range(n_epochs):
-        # for sample in data
-        n_correct = 0
-        for l, d in zip(labels, data):
-            # run network
-            fire_matrix = run_network_early_exit(neurons, encoders, d, sim_time, window_size=window_size)
-
-            reset_network(neurons, encoders)
-
-            steady_state_t = len(fire_matrix)
-
-            x, y = forward_pass(fire_matrix, dpe_weights)
-
-            y_hat = np.zeros(len(classes))
-            y_hat[l] = 1
-
-            update_weights(dpe_weights, x, y, y_hat)
-            
-            correct = 0
-            if np.argmax(y) == l:
-                n_correct += 1
-                correct = 1
-
-            if n_proccessed == 0:
-                avg_steady_state_t = steady_state_t
-                cumulative_acc.append(correct)    
-            else:
-                avg_steady_state_t = (n_proccessed * avg_steady_state_t + steady_state_t)/(n_proccessed+1)
-                cumulative_avg = (n_proccessed * cumulative_acc[-1] + float(correct))/(n_proccessed + 1)
-                cumulative_acc.append(cumulative_avg)
-
-            n_proccessed += 1
-                
-        E_t.append(float(n_correct)/len(data))
-
-    return E_t, avg_steady_state_t, cumulative_acc
 
 # uses io pairs and an SNN to train a dpe layer
 def train_TS(n_epochs, TS_inputs, TS_outputs, neurons, n_input, write_noise_std = 0, silent=True, TS_inputs_te = None, TS_outputs_te = None, initial_weights = None, initial_bias = None, relative=False, post_sample_reset=True, reset_synapses=True, post_epoch_reset=False):
@@ -154,17 +84,6 @@ def train_TS(n_epochs, TS_inputs, TS_outputs, neurons, n_input, write_noise_std 
 
     return Training_mses, Testing_mses, dpe_weights, dpe_bias
 
-
-
-def predict(neurons, encoders, dpe_weights, sample, sim_time=100, window_size=10):
-    # run network
-    fire_matrix = run_network_early_exit(neurons, encoders, sample, sim_time, window_size=window_size)
-
-    reset_network(neurons, encoders)
-
-    _, y = forward_pass(fire_matrix, dpe_weights)
-
-    return y
 
 
 # takes inputs of specific window size and calculates outputs for testing then plots if plt_len > 0
