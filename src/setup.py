@@ -15,7 +15,6 @@ setup(name='snn_dpe',
           'ipykernel',
           'regex',
           'networkx',
-          'multiprocessing',
           'tqdm'
       ],
      )
