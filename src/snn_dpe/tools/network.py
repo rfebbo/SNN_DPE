@@ -242,3 +242,36 @@ def run_network_timeseries(neurons, data, n_input):
                 spike_raster[t].append(0)
 
     return np.asarray(spike_raster)
+
+# same as run_network_timeseries but for n-dimensional input
+def run_network_timeseries_nD(neurons, data, n_input):
+    # simulate
+    spike_raster = []
+    for i in range(len(data)):
+        spike_raster.append([])
+
+    # number of input neurons per dim (eg. 3 dim, 12 inp -> 2)
+    n_per_dim = int(n_input/2/len(data[0]))
+
+    # feed a peice of data in at each timestep
+    for t in range(len(data)):
+
+        # get the input for this timestep, and apply it to input neurons
+        #   feed each dim in
+        for i, d in enumerate(data[t]):
+            # normally to n_per_dim neurons
+            for j in range(n_per_dim):
+                neurons[j + i*n_per_dim].apply_potential(d) #normal
+
+            # inverted to n_per_dim neurons offset by half of n_input
+            for j in range(n_per_dim):
+                neurons[(j + i*n_per_dim) + int(n_input/2)].apply_potential(-d) #inverted
+
+        # update the network
+        for n in neurons:
+            if n.update():
+                spike_raster[t].append(1)
+            else:
+                spike_raster[t].append(0)
+
+    return np.asarray(spike_raster)

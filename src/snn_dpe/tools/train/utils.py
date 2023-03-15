@@ -11,7 +11,6 @@ def rmse(y, y_hat):
 def forward_pass(fire_matrix, dpe_weights, bias=None):
     x = np.mean(fire_matrix, axis=0)
     y = np.dot(x, dpe_weights)
-    # y = np.sum(y, axis=0)
 
     if bias:
         return x, y + bias
