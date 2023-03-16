@@ -60,9 +60,9 @@ def train_TS(n_epochs, TS_inputs, TS_outputs, neurons, n_input, write_noise_std 
 
             # calculate cumulative average mse
             if mse_avg == 0:
-                mse_avg = mse(y, desired_output)
+                mse_avg = rmse(y, desired_output)
             else:
-                mse_avg = (mse(y, desired_output) + n_processed * mse_avg)/ (n_processed+1)
+                mse_avg = (rmse(y, desired_output) + n_processed * mse_avg)/ (n_processed+1)
 
             n_processed += 1
             pbar.set_description(f"Training MSE: {mse_avg:.4}, Testing MSE: {Testing_mses[-1]:.4}")
@@ -111,7 +111,7 @@ def test_timeseries(TS_inputs, TS_outputs, neurons, dpe_weights, n_input, stride
         else:
             dpe_output = y
 
-        testing_mse += mse(dpe_output, output_sample)
+        testing_mse += rmse(dpe_output, output_sample)
 
         if t < plot_len:        
             dpe_time.append(t)
@@ -206,7 +206,7 @@ def train_TS_nD(n_epochs, TS_inputs, TS_outputs, neurons, n_input, write_noise_s
     return Training_mses, Testing_mses, dpe_weights, dpe_bias
 
 # takes inputs of specific window size and calculates outputs for testing then plots if plt_len > 0
-def test_timeseries_nD(TS_inputs, TS_outputs, neurons, dpe_weights, n_input, stride=1, TS_data = None, bias = None, relative=False, plot_len = 200, post_sample_reset=True, reset_synapses=True, plt_fn=None):
+def test_timeseries_nD(TS_inputs, TS_outputs, neurons, dpe_weights, n_input, stride=1, TS_data = None, bias = None, relative=False, plot_len = 200, post_sample_reset=True, reset_synapses=True, plt_fn=None, input_warmup_only=False):
     
     warmup = len(TS_inputs[0])
     testing_rmse = 0
@@ -214,13 +214,20 @@ def test_timeseries_nD(TS_inputs, TS_outputs, neurons, dpe_weights, n_input, str
     # for plotting
     dpe_outputs = []
     dpe_time = []
-    
+
+    # used for input_warmup_only mode
+    SNN_input = TS_inputs[0]
+
     for i, (input_sample, output_sample) in enumerate(zip(TS_inputs, TS_outputs)):
+        if input_warmup_only:
+            input_sample = SNN_input
+
         output_sample =output_sample[0]
         t = i*stride+warmup
 
         spike_raster = run_network_timeseries_nD(neurons, input_sample, n_input)
 
+        
         if post_sample_reset:
             for n in neurons:
                 n.reset(reset_synapses)
@@ -238,6 +245,12 @@ def test_timeseries_nD(TS_inputs, TS_outputs, neurons, dpe_weights, n_input, str
         if t < plot_len:        
             dpe_time.append(t)
             dpe_outputs.append(dpe_output)
+        elif plot_len != 0:
+            break
+
+        if input_warmup_only:
+            SNN_input[:-1] = SNN_input[1:]
+            SNN_input[-1] = dpe_output
 
     if plt_fn is not None:
         plt_fn(TS_data, te_data=np.asarray(dpe_outputs), plt_len=plot_len)
