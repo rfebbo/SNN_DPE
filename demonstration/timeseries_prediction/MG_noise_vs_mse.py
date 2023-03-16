@@ -1,7 +1,4 @@
 from multiprocessing.pool import Pool
-from multiprocessing import freeze_support
-
-
 import csv
 
 
@@ -69,7 +66,6 @@ def run_test(args):
     return tr_mses, te_mses, noise_axis
 
 if __name__ == '__main__':
-    freeze_support()
 
     n_tests = 10
     n_threads = 12
