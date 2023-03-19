@@ -1,6 +1,5 @@
 # from multiprocessing.pool import ThreadPool as Pool
 from multiprocessing.pool import Pool
-from multiprocessing import freeze_support
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -50,17 +49,17 @@ def run_test(args):
         n_synapses = int((n_neurons**2)*synapse_density)
 
         # dpe noise
-        write_noise = n
+        write_noise = 0
         # synapse parameters
         drift = 0
-        synapse_noise = 0
+        synapse_noise = n
 
         # training parameters
         n_epochs = 5
         post_sample_reset = True #also applies to testing
         reset_synapses = True #also applies to testing
         post_epoch_reset = False
-        LD_inputs_te_noise = LD_inputs_te + np.random.normal(0, 0)
+        LD_inputs_te_noise = LD_inputs_te + np.random.normal(0, 0) * (LD_max-LD_min)
 
         neurons = create_network(n_neurons, n_synapses, negative_weights = True, threshold_range = (0.35, 1), leak_range = (0.05, 0.25), weight_factor = 1, std_dev=synapse_noise, drift = drift)
         # train
@@ -72,18 +71,19 @@ def run_test(args):
 
     return tr_mses, te_mses, noise_axis
 
+if __name__ == '__main__':
 
-n_tests = 12
-n_threads = 12
-with Pool(processes=n_threads) as p:
-    results = list(tqdm(p.imap(run_test, range(n_tests)), total=n_tests))
-    
-
-import csv
-
-for i, r in enumerate(results):
-    with open(f'./noise_results/Lorenz/write_noise/LD_noise_vs_MSE_write_noise_{i+30}.csv', 'w') as f:
-        wtr = csv.writer(f, delimiter=',', lineterminator='\n')
+    n_tests = 12
+    n_threads = 6
+    with Pool(processes=n_threads) as p:
+        results = list(tqdm(p.imap(run_test, range(n_tests)), total=n_tests))
         
-        for data in zip(r[0], r[1], r[2]):
-            wtr.writerow(list(data))
+
+    import csv
+
+    for i, r in enumerate(results):
+        with open(f'./noise_results/Lorenz/synapse/LD_noise_vs_MSE_synapse_noise_{i}.csv', 'w') as f:
+            wtr = csv.writer(f, delimiter=',', lineterminator='\n')
+            
+            for data in zip(r[0], r[1], r[2]):
+                wtr.writerow(list(data))
