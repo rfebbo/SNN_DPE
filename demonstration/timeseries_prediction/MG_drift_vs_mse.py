@@ -11,8 +11,8 @@ from snn_dpe.tools.network import create_network
 from snn_dpe.tools.plotting import *
 from snn_dpe.tools.train.timeseries import train_TS
 
-MG_data_tr = Mackey_Glass.read_MG_data('./Data/MarkusThill-MGAB-60f6b17/1.csv', normalize=True)
-MG_data_te = Mackey_Glass.read_MG_data('./Data/MarkusThill-MGAB-60f6b17/2.csv', normalize=True)
+MG_data_tr = Mackey_Glass.read_MG_data('../../Data/MarkusThill-MGAB-60f6b17/1.csv', normalize=True)
+MG_data_te = Mackey_Glass.read_MG_data('../../Data/MarkusThill-MGAB-60f6b17/2.csv', normalize=True)
 
 # slice up MG into input, output pairs
 input_window_size = 10
@@ -72,40 +72,40 @@ def run_test(args):
 
 if __name__ == '__main__':
 
-    n_tests = 10
+    n_tests = 30
     n_threads = 12
     with Pool(processes=n_threads) as p:
         results = list(tqdm(p.imap(run_test, range(n_tests)), total=n_tests))
         
-    (tr_mses, te_mses, drift_axis, noise_axis) = np.mean(results, axis=0)
+    # (tr_mses, te_mses, drift_axis, noise_axis) = np.mean(results, axis=0)
 
 
 
-    plt.plot(drift_axis, tr_mses, label='Training')
-    plt.plot(drift_axis, te_mses, label='Testing')
-    plt.legend()
-    plt.xlabel('Memristor conductance Drift (percentage)')
-    plt.ylabel('Normalized Root Mean Squared Error')
-    # plt.ylim(0, 100)
-    # plt.yscale('log')
-    plt.show()
+    # plt.plot(drift_axis, tr_mses, label='Training')
+    # plt.plot(drift_axis, te_mses, label='Testing')
+    # plt.legend()
+    # plt.xlabel('Memristor conductance Drift (percentage)')
+    # plt.ylabel('Normalized Root Mean Squared Error')
+    # # plt.ylim(0, 100)
+    # # plt.yscale('log')
+    # plt.show()
 
     for i, r in enumerate(results):
-        with open(f'MG_drift_vs_MSE_synapse_{i}.csv', 'w') as f:
+        with open(f'MG_drift_vs_MSE_drift_{i+30}.csv', 'w') as f:
             wtr = csv.writer(f, delimiter=',', lineterminator='\n')
             
             for data in zip(r[0], r[1], r[2]):
                 wtr.writerow(list(data))
 
-    all_tr_mses = []
+    # all_tr_mses = []
 
-    for r in results:
-        all_tr_mses.append([])
-        for d in r[1]:
-            all_tr_mses[-1].append(d)
-    fig = plt.subplots(figsize=(10,10), dpi=200)
-    all_tr_mses = np.asarray(all_tr_mses)
-    print(all_tr_mses.shape)
-    print(all_tr_mses[:,1])
-    plt.boxplot(all_tr_mses)
-    plt.show()
+    # for r in results:
+    #     all_tr_mses.append([])
+    #     for d in r[1]:
+    #         all_tr_mses[-1].append(d)
+    # fig = plt.subplots(figsize=(10,10), dpi=200)
+    # all_tr_mses = np.asarray(all_tr_mses)
+    # print(all_tr_mses.shape)
+    # print(all_tr_mses[:,1])
+    # plt.boxplot(all_tr_mses)
+    # plt.show()
