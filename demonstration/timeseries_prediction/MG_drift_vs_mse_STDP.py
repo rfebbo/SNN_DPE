@@ -77,18 +77,18 @@ if __name__ == '__main__':
     with Pool(processes=n_threads) as p:
         results = list(tqdm(p.imap(run_test, range(n_tests)), total=n_tests))
         
-    (tr_mses, te_mses, drift_axis, noise_axis) = np.mean(results, axis=0)
+    # (tr_mses, te_mses, drift_axis, noise_axis) = np.mean(results, axis=0)
 
 
 
-    plt.plot(drift_axis, tr_mses, label='Training')
-    plt.plot(drift_axis, te_mses, label='Testing')
-    plt.legend()
-    plt.xlabel('Memristor conductance Drift (percentage)')
-    plt.ylabel('Normalized Root Mean Squared Error')
+    # plt.plot(drift_axis, tr_mses, label='Training')
+    # plt.plot(drift_axis, te_mses, label='Testing')
+    # plt.legend()
+    # plt.xlabel('Memristor conductance Drift (percentage)')
+    # plt.ylabel('Normalized Root Mean Squared Error')
     # plt.ylim(0, 100)
     # plt.yscale('log')
-    plt.show()
+    # plt.show()
 
     for i, r in enumerate(results):
         with open(f'MG_drift_vs_MSE_STDPsynapse_{i}.csv', 'w') as f:
@@ -97,15 +97,15 @@ if __name__ == '__main__':
             for data in zip(r[0], r[1], r[2]):
                 wtr.writerow(list(data))
 
-    all_tr_mses = []
+    # all_tr_mses = []
 
-    for r in results:
-        all_tr_mses.append([])
-        for d in r[1]:
-            all_tr_mses[-1].append(d)
-    fig = plt.subplots(figsize=(10,10), dpi=200)
-    all_tr_mses = np.asarray(all_tr_mses)
-    print(all_tr_mses.shape)
-    print(all_tr_mses[:,1])
-    plt.boxplot(all_tr_mses)
-    plt.show()
+    # for r in results:
+    #     all_tr_mses.append([])
+    #     for d in r[1]:
+    #         all_tr_mses[-1].append(d)
+    # fig = plt.subplots(figsize=(10,10), dpi=200)
+    # all_tr_mses = np.asarray(all_tr_mses)
+    # print(all_tr_mses.shape)
+    # print(all_tr_mses[:,1])
+    # plt.boxplot(all_tr_mses)
+    # plt.show()

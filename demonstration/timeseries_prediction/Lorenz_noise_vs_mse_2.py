@@ -12,18 +12,6 @@ from snn_dpe.tools.plotting import plot_network, plot_spike_raster
 from snn_dpe.tools.train.timeseries import (test_timeseries_nD,
                                             train_TS_nD)
 
-import os
-
-import argparse
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--dataset', default=0)
-parser.add_argument('--write', default=0)
-parser.add_argument('--drift_STDP', default=0)
-parser.add_argument('--drift_noSTDP', default=0)
-parser.add_argument('--synapse', default=0)
-parser.add_argument('--all', default=0)
-
 # slice up MG into input, output pairs
 input_window_size = 10
 output_window_size = 1
@@ -64,14 +52,14 @@ def run_test(args):
         write_noise = 0
         # synapse parameters
         drift = 0
-        synapse_noise = n
+        synapse_noise = 0
 
         # training parameters
         n_epochs = 5
         post_sample_reset = True #also applies to testing
         reset_synapses = True #also applies to testing
         post_epoch_reset = False
-        LD_inputs_te_noise = LD_inputs_te + np.random.normal(0, 0) * (LD_max-LD_min)
+        LD_inputs_te_noise = LD_inputs_te + np.random.normal(0, n) * (LD_max-LD_min)
 
         neurons = create_network(n_neurons, n_synapses, negative_weights = True, threshold_range = (0.35, 1), leak_range = (0.05, 0.25), weight_factor = 1, std_dev=synapse_noise, drift = drift)
         # train
@@ -85,47 +73,7 @@ def run_test(args):
 
 if __name__ == '__main__':
 
-    write_fn = os.listdir('./noise_results/Lorenz/write_noise/')
-    synapse_fn = os.listdir('./noise_results/Lorenz/synapse/')
-    dataset_fn = os.listdir('./noise_results/Lorenz/dataset_noise/')
-    all_fn = os.listdir('./noise_results/Lorenz/all_noise/')
-    drift_fn = os.listdir('./noise_results/Lorenz/drift/')
-
-    n_dataset = 0
-    n_drift = 0
-    n_drift_stdp = 0
-    n_synapse = 0
-    n_write = 0
-    n_all = 0
-
-    for fn in dataset_fn:
-        if '.csv' in fn:
-            n_dataset += 1
-
-            
-    for fn in synapse_fn:
-        if '.csv' in fn:
-            n_synapse += 1
-
-            
-    for fn in write_fn:
-        if '.csv' in fn:
-            n_write += 1
-            
-    for fn in all_fn:
-        if '.csv' in fn:
-            n_all += 1
-            
-    for fn in drift_fn:
-        if '.csv' in fn:
-            if 'STDP' in fn:
-                n_drift_stdp += 1
-            else:
-                n_drift += 1
-
-    
-
-    n_tests = 12
+    n_tests = 10
     n_threads = 10
     with Pool(processes=n_threads) as p:
         results = list(tqdm(p.imap(run_test, range(n_tests)), total=n_tests))
@@ -134,7 +82,7 @@ if __name__ == '__main__':
     import csv
 
     for i, r in enumerate(results):
-        with open(f'./noise_results/Lorenz/synapse/LD_noise_vs_MSE_synapse_noise_{i}.csv', 'w') as f:
+        with open(f'./noise_results/Lorenz/dataset_noise/LD_noise_vs_MSE_dataset_noise_{i+10}.csv', 'w') as f:
             wtr = csv.writer(f, delimiter=',', lineterminator='\n')
             
             for data in zip(r[0], r[1], r[2]):
