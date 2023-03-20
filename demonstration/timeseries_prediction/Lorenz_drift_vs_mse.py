@@ -39,8 +39,10 @@ def run_test(args):
     np.random.seed()
 
     noise_axis = np.linspace(0, 0.1, num=40)
-
-    for n in noise_axis:
+    drift_axis = np.linspace(0, 0.1, num=40)
+    n=0
+    #for n in noise_axis:
+    for d in drift_axis:
 
         # create a test network
         n_neurons = 30
@@ -51,8 +53,9 @@ def run_test(args):
         # dpe noise
         write_noise = n
         # synapse parameters
-        drift = 0
+        drift = d
         synapse_noise = 0
+        stdp=False
 
         # training parameters
         n_epochs = 5
@@ -61,7 +64,7 @@ def run_test(args):
         post_epoch_reset = False
         LD_inputs_te_noise = LD_inputs_te + np.random.normal(0, 0) * (LD_max-LD_min)
 
-        neurons = create_network(n_neurons, n_synapses, negative_weights = True, threshold_range = (0.35, 1), leak_range = (0.05, 0.25), weight_factor = 1, std_dev=synapse_noise, drift = drift)
+        neurons = create_network(n_neurons, n_synapses, negative_weights = True, threshold_range = (0.35, 1), leak_range = (0.05, 0.25), weight_factor = 1, std_dev=synapse_noise, drift = drift, stdp=stdp)
         # train
         training_mses, testing_mses, _, _ = train_TS_nD(n_epochs, LD_inputs_tr, LD_outputs_tr, neurons, n_input, silent=True, TS_inputs_te=LD_inputs_te_noise, TS_outputs_te=LD_outputs_te, relative=True, write_noise_std=write_noise, post_sample_reset=post_sample_reset, reset_synapses=reset_synapses, post_epoch_reset=post_epoch_reset)
         
@@ -69,7 +72,7 @@ def run_test(args):
         tr_mses.append(training_mses[-1] / (LD_max-LD_min))
         te_mses.append(testing_mses[-1] / (LD_max-LD_min))
 
-    return tr_mses, te_mses, noise_axis
+    return tr_mses, te_mses, drift_axis
 
 if __name__ == '__main__':
 
@@ -82,7 +85,7 @@ if __name__ == '__main__':
     import csv
 
     for i, r in enumerate(results):
-        with open(f'./noise_results/Lorenz/write_noise/LD_noise_vs_MSE_write_noise_{i}.csv', 'w') as f:
+        with open(f'./noise_results/Lorenz/drift/LD_drift_vs_MSE_{i}.csv', 'w') as f:
             wtr = csv.writer(f, delimiter=',', lineterminator='\n')
             
             for data in zip(r[0], r[1], r[2]):
