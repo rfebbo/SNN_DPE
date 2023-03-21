@@ -125,8 +125,8 @@ if __name__ == '__main__':
 
     
 
-    n_tests = 12
-    n_threads = 10
+    n_tests = 40
+    n_threads = 16
     with Pool(processes=n_threads) as p:
         results = list(tqdm(p.imap(run_test, range(n_tests)), total=n_tests))
         

@@ -73,8 +73,8 @@ def run_test(args):
 
 if __name__ == '__main__':
 
-    n_tests = 10
-    n_threads = 10
+    n_tests = 40
+    n_threads = 16
     with Pool(processes=n_threads) as p:
         results = list(tqdm(p.imap(run_test, range(n_tests)), total=n_tests))
         
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     import csv
 
     for i, r in enumerate(results):
-        with open(f'./noise_results/Lorenz/dataset_noise/LD_noise_vs_MSE_dataset_noise_{i+10}.csv', 'w') as f:
+        with open(f'./noise_results/Lorenz/dataset_noise/LD_noise_vs_MSE_dataset_noise_{i+20}.csv', 'w') as f:
             wtr = csv.writer(f, delimiter=',', lineterminator='\n')
             
             for data in zip(r[0], r[1], r[2]):
