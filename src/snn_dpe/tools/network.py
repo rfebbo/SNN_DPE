@@ -47,11 +47,14 @@ def run_network(neurons, encoders, enc_input, sim_time):
     for i, e in enumerate(encoders):
         e.set_value(enc_input[i])
 
-    # simulate
+    # create a 2D array which represents the spike raster
+    # where the first dimension is which neuron/encoder is spiking
+    # and the second dimension is a list of all the times it spiked
     fires = []
     for i in range(len(neurons) + len(encoders)):
         fires.append([])
-
+    
+    # simulate
     for t in range(sim_time):
         # get the input for this timestep, and apply it to input neurons
         for i, e in enumerate(encoders):
