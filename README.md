@@ -5,7 +5,7 @@ pip install --editable .
 
 # Introduction
 
-This repository contains code for generating random spiking nerual networks as reservoirs. These reservoirs are simulated for some time with spiking inputs relative to a datasample in a data set. Then, with a matrix of weights(DPE) which uses the average spiking rate of each neuron as the input, gradient descent is used to train the weights on classificaion and timeseries prediction tasks.
+This repository contains code for generating random spiking neural networks as reservoirs. These reservoirs are simulated for some time with spiking inputs relative to a datasample in a data set. Then, with a matrix of weights(DPE) which uses the average spiking rate of each neuron as the input, gradient descent is used to train the weights on classificaion and timeseries prediction tasks.
 
 # Step-by-step outline with links to demonstration notebooks
 
@@ -28,7 +28,7 @@ This repository contains code for generating random spiking nerual networks as r
     1. Generate multiple SNNs and have one DPE for each of them
     1. train the DPEs like above, and use the collection of SNNs as a genome for EO
     1. Use multiple DPE, SNN outputs as lists of guesses like in Thousand Brains
-    1. use single encoder with attributes passed in at different times
+    1. use single encoder with attributes passed in over time
     1. investigate unsupervised approach
 
 - Notes
