@@ -3,7 +3,11 @@ cd src
 
 pip install --editable .
 
-# Extra
+# Introduction
+
+This repository contains code for generating random spiking nerual networks as reservoirs. These reservoirs are simulated for some time with spiking inputs relative to a datasample in a data set. Then, with a matrix of weights(DPE) which uses the average spiking rate of each neuron as the input, gradient descent is used to train the weights on classificaion and timeseries prediction tasks.
+
+# Step-by-step outline with links to demonstration notebooks
 
 * [Training / EO idea](./demonstration/06_training_test.ipynb)
     1. [Generate a random SNN](./demonstration/02_network_creation.ipynb)
@@ -17,18 +21,15 @@ pip install --editable .
     1. [Save SNN with fitness](./demonstration/07_saving_network.ipynb)
     1. repeat 'till a collecion (population) of SNNs with fitnesses are obtained and do EO
 
-- Future Idea
+
+# Extra
+
+- Future Ideas
     1. Generate multiple SNNs and have one DPE for each of them
     1. train the DPEs like above, and use the collection of SNNs as a genome for EO
-
-- Future Idea
     1. Use multiple DPE, SNN outputs as lists of guesses like in Thousand Brains
-
-- Future Idea
     1. use single encoder with attributes passed in at different times
-
-- ToDo
     1. investigate unsupervised approach
 
 - Notes
-    1. In unshuffled dataset, accuracy is artificially high during training(ie. network learns weights that can switch between classes quickly)
+    1. In unshuffled datasets, the accuracy is artificially high during training. This is due to the DPE learning weights that can switch between classes after a few datasamples into the new class
