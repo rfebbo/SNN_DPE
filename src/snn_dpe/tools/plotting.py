@@ -47,7 +47,7 @@ def plot_spike_raster(fire_matrix, print_rates = False):
     ax.tick_params(axis='both', labelsize=20)
     ax.set_ylabel('neuron ID', fontsize=20)
     ax.set_title('Spike Raster', fontsize=20)
-    ax.set_xlabel('Time (ms)', fontsize=20)
+    ax.set_xlabel('Timestep', fontsize=20)
 
     # plt.savefig('Images/Network_output_w_early_stop.pdf')
     plt.show()
@@ -59,40 +59,6 @@ def plot_spike_raster(fire_matrix, print_rates = False):
         for i, x_i in zip(reversed(range(n_neurons)),reversed(x)):
             print(f'neuron {i}: {x_i}')
 
-
-
-def plot_spikes(fires, attributes, einputs, sim_time):
-    n_neurons = len(fires) - len(attributes)
-
-    fig, ax = plt.subplots(2, 1, figsize=(15,10), sharex=True, gridspec_kw={'height_ratios' : [1, 3]})
-
-    for i, f in enumerate(fires):
-        # plot encoders on separate axis
-        if i < len(einputs):
-            ax[0].scatter(f, np.ones(len(f)) * i, marker='|')
-        else:
-            ax[1].scatter(f, np.ones(len(f)) * (i - len(attributes)), marker='|')
-
-    enc_labels = []
-    for v, ei in zip(attributes, einputs):
-        enc_labels.append(f'{v} ({ei:.2f})')
-
-    ax[0].set_ylim(-0.5, len(attributes) - 0.5)
-    ax[0].set_yticks(ticks=range(len(attributes)), labels=enc_labels)
-    ax[0].tick_params(axis='both', labelsize=15)
-    ax[0].set_title('encoder spikes', fontsize=20)
-
-    ax[1].set_ylim(-0.5, n_neurons - 0.5)
-    ax[1].set_yticks(ticks=range(n_neurons), labels=range(n_neurons))
-    ax[1].tick_params(axis='both', labelsize=20)
-    ax[1].set_ylabel('neuron ID', fontsize=20)
-    ax[1].set_title('neuron spikes', fontsize=20)
-
-
-    ax[1].set_xlabel('Time (ms)', fontsize=20)
-
-    # plt.savefig('Images/Network_output_w_enc.pdf')
-    plt.show()
 
 def plot_steady_state(steady_state_t, total_fires, window_size, m1, m2):
     # plotting code

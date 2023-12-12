@@ -5,7 +5,7 @@ import numpy as np
 from snn_dpe import Encoder, Neuron, Synapse
 
 
-def create_network(n_neurons, n_synapses, negative_weights = False, threshold_range = (0.35, 0.55), leak_range = (0.05, 0.25), weight_factor = 1.8, std_dev=0, drift=0, stdp=False):
+def create_network(n_neurons, n_synapses, threshold_range = (0.35, 0.55), leak_range = (0.05, 0.25), weight_range = [.2,1.8], std_dev=0, drift=0, stdp=False):
     Neurons = []
 
     for i in range(n_neurons):
@@ -15,17 +15,13 @@ def create_network(n_neurons, n_synapses, negative_weights = False, threshold_ra
         Neurons.append(n)
 
     for i in range(n_synapses):
-        n1_id = np.random.choice(range(n_neurons))
-        n2_id = np.random.choice(range(n_neurons))
+        n1_id = np.random.choice(n_neurons)
+        n2_id = np.random.choice(n_neurons)
 
         n1 = Neurons[n1_id]
         n2 = Neurons[n2_id]
 
-        
-        weight = np.random.rand(1)[0] * weight_factor
-
-        if negative_weights:
-            weight -= weight_factor/2
+        weight = np.random.uniform(low=weight_range[0], high=weight_range[1])
 
         s = Synapse(n1, n2, weight, std_dev, drift, stdp)
 
@@ -49,9 +45,9 @@ def run_network(neurons, encoders, enc_input, sim_time):
 
     # create a 2D array which represents the spike raster
     # where the first dimension is which neuron/encoder is spiking
-    # and the second dimension is a list of all the times it spiked
+    # and the second dimension is time, 0 is no fire, 1 is a fire
     fires = []
-    for i in range(len(neurons) + len(encoders)):
+    for i in range(sim_time):
         fires.append([])
     
     # simulate
@@ -59,15 +55,20 @@ def run_network(neurons, encoders, enc_input, sim_time):
         # get the input for this timestep, and apply it to input neurons
         for i, e in enumerate(encoders):
             if e.update():
-                fires[i].append(t)
+                fires[t].append(1)
                 neurons[i].apply_potential(1)
+            else:
+                fires[t].append(0)
+
 
         # update the network
         for n in neurons:
             if n.update():
-                fires[n.id + len(encoders)].append(t)
+                fires[t].append(1)
+            else:
+                fires[t].append(0)
 
-    return fires
+    return np.asarray(fires)
 
 def reset_network(neurons, encoders):
     for n in neurons:

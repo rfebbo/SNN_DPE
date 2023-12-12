@@ -17,7 +17,7 @@ class Neuron:
             self.spike_event = 0
         for s in self.synapses:
             s.update()
-        if self.membrane_voltage > self.threshold:
+        if self.membrane_voltage >= self.threshold:
             self.spike()
             self.membrane_voltage = 0
             self.spike_event = 1
