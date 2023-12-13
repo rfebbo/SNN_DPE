@@ -30,7 +30,6 @@ def saturation(sr):
 # save_folder - folder to save results to, if None don't save
 # plot - will plot the spike rasters
 def run_distance_test(connectivity, n_enc = 5, n_neurons = 100, n_runs=1, plot=False, save_folder = None):
-    print((connectivity, n_enc, n_neurons, n_runs, plot, save_folder))
     # create a test network and encoders
     n_synapses = int((n_neurons ** 2) * connectivity)
 
