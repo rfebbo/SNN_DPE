@@ -31,10 +31,10 @@ def plot_iris_data(data, classes, attributes, labels):
         ax_i.set_ylabel(attributes[2*i+1])
         ax_i.legend()
 
-def plot_spike_raster(fire_matrix, print_rates = False):
+def plot_spike_raster(fire_matrix, print_rates = False, title=None):
     n_neurons = len(fire_matrix[0])
 
-    fig, ax = plt.subplots(figsize=(10,5))
+    fig, ax = plt.subplots()
     
     for i in range(n_neurons):
         f = fire_matrix[:, i]
@@ -43,11 +43,12 @@ def plot_spike_raster(fire_matrix, print_rates = False):
 
     ax.set_ylim(-0.5, n_neurons - 0.5)
     ax.set_xlim(0, len(fire_matrix))
-    ax.set_yticks(ticks=range(0, n_neurons+1, int(n_neurons/10)), labels=range(0, n_neurons+1, int(n_neurons/10)))
-    ax.tick_params(axis='both', labelsize=20)
-    ax.set_ylabel('neuron ID', fontsize=20)
-    ax.set_title('Spike Raster', fontsize=20)
-    ax.set_xlabel('Timestep', fontsize=20)
+    # ax.set_yticks(ticks=range(0, n_neurons+1, int(n_neurons/10)), labels=range(0, n_neurons+1, int(n_neurons/10)))
+    ax.tick_params(axis='both')
+    ax.set_xlabel('Timestep')
+
+    if isinstance(title, str):
+        ax.set_title(title)
 
     # plt.savefig('Images/Network_output_w_early_stop.pdf')
     plt.show()

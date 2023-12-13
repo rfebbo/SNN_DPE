@@ -10,3 +10,5 @@ max_f = 100
 sim_f = 100
 
 n_enc = 5
+
+enc_type = 'period'

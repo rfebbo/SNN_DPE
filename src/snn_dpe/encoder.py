@@ -15,11 +15,11 @@ class Encoder:
 
         self.enc_type = enc_type
 
-    # set this to whatever value the encoder should be representing
+    # set this to whatever value the encoder should be representing [0, 1]
     def set_value(self, value):
         self.last_fire = 0
         
-        # using the min and max frequency, calculate the frequency of the value
+        # using the min and max frequency, calculate the frequency of value
         self.value = value
         self.value_f = ((self.max_f - self.min_f) * value) + self.min_f
 
