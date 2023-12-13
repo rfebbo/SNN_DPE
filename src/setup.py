@@ -16,6 +16,7 @@ setup(name='snn_dpe',
           'regex',
           'networkx',
           'tqdm',
-          'scipy'
+          'scipy',
+          'sympy'
       ],
      )
