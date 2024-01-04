@@ -49,6 +49,11 @@ def run_distance_test(connectivity, n_enc = 5, n_neurons = 100, n_runs=1, plot=F
     run['n_enc'] = n_enc
     run['n_neurons'] = n_neurons
     run['n_runs'] = n_runs
+    run['n_synapses'] = n_synapses
+    run['min_f'] = min_f
+    run['max_f'] = max_f
+    run['sim_f'] = sim_f
+    run['sim_time'] = sim_time
 
     run['enc_inputs'] = []
     run['input distances'] = []
