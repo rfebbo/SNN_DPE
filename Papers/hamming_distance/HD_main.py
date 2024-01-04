@@ -45,12 +45,19 @@ def run_distance_test(connectivity, n_enc = 5, n_neurons = 100, n_runs=1, plot=F
 
     # dict for storing run results
     run = {}
+    run['connectivity'] = connectivity
+    run['n_enc'] = n_enc
+    run['n_neurons'] = n_neurons
+    run['n_runs'] = n_runs
+
+    run['enc_inputs'] = []
     run['input distances'] = []
     run['output distances'] = []
     run['input saturation 1'] = []
     run['input saturation 2'] = []
     run['output saturation 1'] = []
     run['output saturation 2'] = []
+
     for _ in range(n_runs):
         # seed before doing anything random in multiprocessing
         np.random.seed()
@@ -61,11 +68,12 @@ def run_distance_test(connectivity, n_enc = 5, n_neurons = 100, n_runs=1, plot=F
 
         # create random encoder inputs from no activity to full activity
         enc_inputs = np.random.uniform(0, 1, (n_enc))
+        run['enc_inputs'].append(enc_inputs)
 
         # store spike rasters for input/output pairs
         network_inputs = []
         network_outputs = []
-        # permute encoder order
+        # permute encoder order (see below), simulate the network, save the spike rasters
             # this way we get a varying number of distances between each input, 
             # but the overall activity into the reservoir is the same for each run
         for enc_input in multiset_permutations(enc_inputs):
