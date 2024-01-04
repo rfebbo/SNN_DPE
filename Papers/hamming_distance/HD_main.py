@@ -73,7 +73,7 @@ def run_distance_test(connectivity, n_enc = 5, n_neurons = 100, n_runs=1, plot=F
 
         # create random encoder inputs from no activity to full activity
         enc_inputs = np.random.uniform(0, 1, (n_enc))
-        run['enc_inputs'].append(enc_inputs)
+        run['enc_inputs'].append(list(enc_inputs))
 
         # store spike rasters for input/output pairs
         network_inputs = []
