@@ -103,6 +103,8 @@ def run_distance_test(connectivity, n_enc = 5, n_neurons = 100, n_runs=1, save_f
         subprocess.run(['mkdir', save_folder, '-p'])
         with open(f'{save_folder}/{datetime.fromtimestamp(time.time())}', 'w') as f:
             f.write(json.dumps(run))
+    else:
+        return run
 
 
 def run_distance_test_proc(args):
