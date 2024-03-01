@@ -1,3 +1,4 @@
+# this program calls functions in HD_main.py
 import tqdm
 from multiprocessing import Pool
 import numpy as np
@@ -29,6 +30,8 @@ if __name__ == '__main__':
                         help='number of runs to perform for each connectivity (default: 100)')
     parser.add_argument('--n_proc_2', default=1, type=int, required=False,
                         help='number of processes to parallelize over runs')
+    parser.add_argument('--save_networks', default=True, type=bool, required=False,
+                        help='wheather or not to save the networks')
 
     args = parser.parse_args()
 

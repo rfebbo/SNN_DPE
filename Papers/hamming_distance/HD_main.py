@@ -31,7 +31,7 @@ def saturation(sr):
 # n_runs - the number of random reservoirs created and tested
 # save_folder - folder to save results to, if None don't save
 # plot - will plot the spike rasters
-def run_distance_test(connectivity, n_enc = 5, n_neurons = 100, n_runs=1, save_folder = None, n_proc = 8):
+def run_distance_test(connectivity, n_enc = 5, n_neurons = 100, n_runs=1, save_folder = None, n_proc = 8, save_networks = False):
     # create a test network and encoders
     n_synapses = int((n_neurons ** 2) * connectivity)
 
@@ -67,7 +67,7 @@ def run_distance_test(connectivity, n_enc = 5, n_neurons = 100, n_runs=1, save_f
 
     # print(f'Running Connectivity {connectivity}...')
     if n_proc > 1 and n_runs > 1:
-        args = [(n_neurons, n_synapses, n_enc, min_f, max_f, sim_f, sim_time,)] * n_runs
+        args = [(n_neurons, n_synapses, n_enc, min_f, max_f, sim_f, sim_time)] * n_runs
         with Pool(n_proc) as p:
             # run['enc_inputs'], run['input distances'], run['output distances'], \
             # run['input saturation 1'], run['input saturation 2'], run['output saturation 1'], \
@@ -89,7 +89,7 @@ def run_distance_test(connectivity, n_enc = 5, n_neurons = 100, n_runs=1, save_f
             sub_run = {}
             sub_run['enc_inputs'], sub_run['input distances'], sub_run['output distances'], \
             sub_run['input saturation 1'], sub_run['input saturation 2'], sub_run['output saturation 1'], \
-            sub_run['output saturation 2'] = run_distance_test_proc(args)
+            sub_run['output saturation 2'], neurons = run_distance_test_proc(args)
 
             run['enc_inputs'].append(sub_run['enc_inputs'])
             run['input distances'].append(sub_run['input distances'])
@@ -98,6 +98,9 @@ def run_distance_test(connectivity, n_enc = 5, n_neurons = 100, n_runs=1, save_f
             run['input saturation 2'].append(sub_run['input saturation 2'])
             run['output saturation 1'].append(sub_run['output saturation 1'])
             run['output saturation 2'].append(sub_run['output saturation 2'])
+
+            if save_networks:
+                run['neurons'] = neurons
             
     if isinstance(save_folder, str):
         subprocess.run(['mkdir', save_folder, '-p'])
@@ -157,4 +160,4 @@ def run_distance_test_proc(args):
             output_saturations_1.append(saturation(network_outputs[i]))
             output_saturations_2.append(saturation(network_outputs[j]))
 
-    return list(enc_inputs), input_distances, output_distances, input_saturations_1, input_saturations_2, output_saturations_1, output_saturations_2
+    return list(enc_inputs), input_distances, output_distances, input_saturations_1, input_saturations_2, output_saturations_1, output_saturations_2, neurons
