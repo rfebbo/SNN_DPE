@@ -17,18 +17,22 @@ class Encoder:
 
     # set this to whatever value the encoder should be representing [0, 1]
     def set_value(self, value):
-        self.last_fire = 0
+        self.last_fire = 1
         
         # using the min and max frequency, calculate the frequency of value
         self.value = value
-        self.value_f = ((self.max_f - self.min_f) * value) + self.min_f
 
         # using the simulation frequency, calculate the period of the value
         #   (the number of simulation timesteps between fires)
         if self.enc_type == 'frequency':
+            self.value_f = ((self.max_f - self.min_f) * value) + self.min_f
             self.fire_period = int(self.sim_f / self.value_f)
         elif self.enc_type == 'period':
-            self.fire_period = -(((self.sim_f/self.min_f - self.sim_f/self.max_f) * value) + self.sim_f/self.max_f) + (self.sim_f/self.min_f + self.sim_f/self.max_f)
+            min_period = self.sim_f/self.max_f
+            max_period = self.sim_f/self.min_f
+            period_span = max_period - min_period
+            self.fire_period = ((period_span * (1-value)) + min_period)# + (max_period + min_period)
+            self.value_f = int(self.sim_f / self.fire_period)
             self.fire_period = int(self.fire_period)
         else:
             print('error')
@@ -39,11 +43,11 @@ class Encoder:
 
         # fire everytime the fire period is completed
         if self.last_fire > self.fire_period:
-            self.last_fire = 0
+            self.last_fire = 1
             return 1
         else:
             return 0
 
     def reset(self):
-        self.last_fire = 0
+        self.last_fire = 1
 
