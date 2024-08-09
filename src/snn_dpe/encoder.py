@@ -3,7 +3,7 @@
 #   lower values into the encoder -> slower encoder spiking -> less active network
 #   encoding the period directly forces the resolution across the input space to be the same, otherwise it will be squished at higher values
 class Encoder:
-    def __init__(self, min_f, max_f, sim_f, enc_type='period'):
+    def __init__(self, min_f, max_f, sim_f):
         self.last_fire = 0
 
         # min, max frequencies that can be output by this encoder
@@ -12,8 +12,6 @@ class Encoder:
 
         # the frequency at which the simulation should be running
         self.sim_f = sim_f
-
-        self.enc_type = enc_type
 
     # set this to whatever value the encoder should be representing
     def set_value(self, value):
@@ -25,13 +23,7 @@ class Encoder:
 
         # using the simulation frequency, calculate the period of the value
         #   (the number of simulation timesteps between fires)
-        if self.enc_type == 'frequency':
-            self.fire_period = int(self.sim_f / self.value_f)
-        elif self.enc_type == 'period':
-            self.fire_period = -(((self.sim_f/self.min_f - self.sim_f/self.max_f) * value) + self.sim_f/self.max_f) + (self.sim_f/self.min_f + self.sim_f/self.max_f)
-            self.fire_period = int(self.fire_period)
-        else:
-            print('error')
+        self.fire_period = int(self.sim_f / self.value_f)
 
     def update(self):
         # step one timestep into simulation (if sim_f is 1000 Hz, one timestep is 1ms)

@@ -2,7 +2,7 @@ import numpy as np
 
 
 # read in the Iris data, can be a subset where the data is limited to 2 classes and 2 attributes
-def read_iris_data(filepath, subset=False, shuffle=False):
+def read_iris_data(filepath, subset=False, shuffle=True):
     classes = { 'Iris-setosa' : 0,
                 'Iris-versicolor' : 1,
                 'Iris-virginica' : 2
