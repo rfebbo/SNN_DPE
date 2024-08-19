@@ -5,13 +5,13 @@ import numpy as np
 from snn_dpe import Encoder, Neuron, Synapse
 
 
-def create_network(n_neurons, n_synapses, negative_weights = False, threshold_range = (0.35, 0.55), leak_range = (0.05, 0.25), weight_factor = 1.8, std_dev=0, drift=0, stdp=False):
+def create_network(n_neurons, n_synapses, negative_weights = False, threshold_range = (0.35, 0.55), leak_range = (0.01, 0.25), weight_factor = 1, delay_range = (0, 4)):
     Neurons = []
 
     for i in range(n_neurons):
         threshold = np.random.uniform(low=threshold_range[0], high=threshold_range[1]) 
         leak = np.random.uniform(low=leak_range[0], high=leak_range[1]) 
-        n = Neuron(i, threshold, leak)
+        n = Neuron(threshold, leak)
         Neurons.append(n)
 
     for i in range(n_synapses):
@@ -20,24 +20,25 @@ def create_network(n_neurons, n_synapses, negative_weights = False, threshold_ra
 
         n1 = Neurons[n1_id]
         n2 = Neurons[n2_id]
-
         
         weight = np.random.rand(1)[0] * weight_factor
 
         if negative_weights:
             weight -= weight_factor/2
 
-        s = Synapse(n1, n2, weight, std_dev, drift, stdp)
+        delay = np.random.randint(delay_range[0], delay_range[1])
+
+        s = Synapse(n1, n2, weight, delay)
 
         Neurons[n1_id].add_synapse(s)
 
     return Neurons
 
 # create a network with encoders and feed it a sample from the dataset
-def create_encoders(n_enc, min_f = 10, max_f = 700, sim_f = 1000, enc_type = 'frequency'):
+def create_encoders(n_enc, min_f = 10, max_f = 700, sim_f = 1000):
     encoders = []
     for _ in range(n_enc):
-        e = Encoder(min_f, max_f, sim_f, enc_type)
+        e = Encoder(min_f, max_f, sim_f)
         encoders.append(e)
 
     return encoders
@@ -48,26 +49,30 @@ def run_network(neurons, encoders, enc_input, sim_time):
         e.set_value(enc_input[i])
 
     # create a 2D array which represents the spike raster
-    # where the first dimension is which neuron/encoder is spiking
+    # where the first dimension is which neuron is spiking
     # and the second dimension is a list of all the times it spiked
-    fires = []
-    for i in range(len(neurons) + len(encoders)):
-        fires.append([])
+    neuron_fires = []
+    encoder_fires = []
+    for i in range(len(neurons)):
+        neuron_fires.append([])
+
+    for i in range(len(encoders)):
+        encoder_fires.append([])
     
     # simulate
     for t in range(sim_time):
-        # get the input for this timestep, and apply it to input neurons
+        # if an encoder spikes, call spike on its neuron
         for i, e in enumerate(encoders):
             if e.update():
-                fires[i].append(t)
-                neurons[i].apply_potential(1)
+                encoder_fires[i].append(t)
+                neurons[i].spike()
 
         # update the network
-        for n in neurons:
+        for i, n in enumerate(neurons):
             if n.update():
-                fires[n.id + len(encoders)].append(t)
+                neuron_fires[i].append(t)
 
-    return fires
+    return neuron_fires, encoder_fires
 
 def reset_network(neurons, encoders):
     for n in neurons:
@@ -278,3 +283,4 @@ def run_network_timeseries_nD(neurons, data, n_input):
                 spike_raster[t].append(0)
 
     return np.asarray(spike_raster)
+

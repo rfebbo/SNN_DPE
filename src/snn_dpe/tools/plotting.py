@@ -61,29 +61,27 @@ def plot_spike_raster(fire_matrix, print_rates = False):
 
 
 
-def plot_spikes(fires, attributes, einputs, sim_time):
-    n_neurons = len(fires) - len(attributes)
-
+def plot_spikes(neuron_fires, encoder_fires, attributes, einputs):
     fig, ax = plt.subplots(2, 1, figsize=(15,10), sharex=True, gridspec_kw={'height_ratios' : [1, 3]})
-
-    for i, f in enumerate(fires):
+    
+    for i, f in enumerate(encoder_fires):
         # plot encoders on separate axis
-        if i < len(einputs):
-            ax[0].scatter(f, np.ones(len(f)) * i, marker='|')
-        else:
-            ax[1].scatter(f, np.ones(len(f)) * (i - len(attributes)), marker='|')
+        ax[0].scatter(f, np.ones(len(f)) * i, marker='|')
+
+    for i, f in enumerate(neuron_fires):
+        ax[1].scatter(f, np.ones(len(f)) * (i), marker='|')
 
     enc_labels = []
-    for v, ei in zip(attributes, einputs):
-        enc_labels.append(f'{v} ({ei:.2f})')
+    for v, ei, i in zip(attributes, einputs, range(len(encoder_fires))):
+        enc_labels.append(f'{v} ({ei:.2f}) (neuron {i})')
 
     ax[0].set_ylim(-0.5, len(attributes) - 0.5)
     ax[0].set_yticks(ticks=range(len(attributes)), labels=enc_labels)
     ax[0].tick_params(axis='both', labelsize=15)
     ax[0].set_title('encoder spikes', fontsize=20)
 
-    ax[1].set_ylim(-0.5, n_neurons - 0.5)
-    ax[1].set_yticks(ticks=range(n_neurons), labels=range(n_neurons))
+    ax[1].set_ylim(-0.5, len(neuron_fires) - 0.5)
+    ax[1].set_yticks(ticks=range(len(neuron_fires)), labels=range(len(neuron_fires)))
     ax[1].tick_params(axis='both', labelsize=20)
     ax[1].set_ylabel('neuron ID', fontsize=20)
     ax[1].set_title('neuron spikes', fontsize=20)

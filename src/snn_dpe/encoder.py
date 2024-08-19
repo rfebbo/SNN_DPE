@@ -30,7 +30,7 @@ class Encoder:
         self.last_fire += 1
 
         # fire everytime the fire period is completed
-        if self.last_fire > self.fire_period:
+        if self.last_fire >= self.fire_period:
             self.last_fire = 0
             return 1
         else:
