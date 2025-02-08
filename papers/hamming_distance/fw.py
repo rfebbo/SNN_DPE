@@ -1,8 +1,10 @@
 import neuro
 import risp
+import eons
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
+
 
 def plot_network(net):
     # visualize
@@ -18,29 +20,55 @@ def plot_network(net):
     # plt.savefig('Images/network.pdf')
     plt.show()
 
-def create_network():
+def net_char(net):
+
+    N = {}
+    for n in net.nodes():
+        N[n] = 0
+
+    for e in net.edges():
+        N[e[1]] += 1
+
+    n_inputs = 0
+    for n in N:
+        n_inputs += N[n]
+
+    print(n_inputs/len(list(net.nodes())))
+
+
+def create_risp_network(\
+        n_input : int, n_hidden : int, n_output : int,\
+        n_synapses : int, vt : float, w_plus : float, w_minus : float):
+
     proc_params = {
         "leak_mode": "none",
-        "min_weight": -1,
-        "max_weight": 1,
-        "min_threshold": -1,
-        "max_threshold": 1,
-        "max_delay": 5,
+        "min_weight": w_minus,
+        "max_weight": w_plus,
+        "min_threshold": 0,
+        "max_threshold": vt,
+        "max_delay": 1,
         "discrete": False,
-        "min_potential": -1
+        "min_potential": -1, 
+        "spike_value_factor" : 1
     }
 
+
+    # proc_params = {
+    #     "leak_mode": "none",
+    #     "min_weight": -1,
+    #     "max_weight": 1,
+    #     "min_threshold": -1,
+    #     "max_threshold": 1,
+    #     "max_delay": 5,
+    #     "discrete": False,
+    #     "min_potential": -1
+    # }
     proc = risp.Processor(proc_params)
 
     np.random.seed()
-    seed = np.random.randint(0,10000000000)
-    n_neurons = 50
-    connectivity = 0.05
-    n_synapses = int(connectivity * (n_neurons**2))
+    seed = np.random.randint(0,1000000000)
+    n_neurons = n_input + n_hidden + n_output
 
-    w_plus = 0.5
-    w_minus = 0.25
-    vt = 1.0
     delay = 1
 
     net = neuro.Network()
@@ -48,10 +76,20 @@ def create_network():
     moa = neuro.MOA()
     moa.seed(seed, "reservoir")
 
-    # print(dir(net))
-    for i in range(n_neurons):
+    for i in range(n_input):
         node = net.add_node(i)
         node.values[0] = vt
+        net.add_input(i)
+
+    for i in range(n_input, n_input + n_output):
+        node = net.add_node(i)
+        node.values[0] = vt
+        net.add_output(i)
+
+    for i in range(n_input + n_output, n_input + n_output + n_hidden):
+        node = net.add_node(i)
+        node.values[0] = vt
+        
 
     while len(list(net.edges())) < n_synapses:
         e = np.random.choice(n_neurons, 2)
@@ -63,8 +101,66 @@ def create_network():
         except:
             continue
 
-        
-    # plot_network(net)
-    return net
+    net.as_json()
+    proc.load_network(net)
 
-net = create_network()
+    neuro.track_all_neuron_events(proc, net)
+    neuro.track_all_output_events(proc, net)
+    
+
+    return net, proc
+
+
+n_neurons = 100
+p_input = 0.1
+p_output = 0.1
+n_input = int(n_neurons * p_input)
+n_output = int(n_neurons * p_output)
+n_hidden = n_neurons - n_input - n_output
+
+# A = average number of inputs per neuron
+# B = average # of inputs required to spike
+# gamma = A/B 
+#   gamma > 1 sensitive network
+#   gamma < 1 insensitive network
+
+
+vt = 32
+w_plus = vt / 4
+w_minus = -(w_plus * 0.5)
+
+B = vt / ((w_plus + w_minus) / 2)
+
+n_synapses = B * n_neurons
+A = n_synapses / n_neurons
+
+if n_synapses > n_neurons ** 2:
+    raise Exception("not enough neurons")
+
+print(A)
+print(B)
+
+gamma = A / B
+print(gamma)
+
+net, proc = create_risp_network(n_input, n_hidden, n_output, n_synapses, vt, w_plus, w_minus)
+
+# net_char(net) 
+for i in range(n_input):
+    for j in range(vt):
+        s = neuro.Spike(i, j, 1.0)
+        proc.apply_spike(s)
+
+proc.run(vt + 20)
+
+print(proc.neuron_charges())
+
+sr = proc.neuron_vectors()
+
+
+for i, n in enumerate(sr):
+    plt.scatter(n, np.ones(len(n)) * i, marker='|')
+
+plt.show()
+
+plot_network(net)
