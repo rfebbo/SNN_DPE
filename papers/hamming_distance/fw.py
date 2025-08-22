@@ -92,10 +92,11 @@ def create_risp_network(\
         
 
     while len(list(net.edges())) < n_synapses:
-        e = np.random.choice(n_neurons, 2)
+        e1 = np.random.choice(n_neurons, 1)
+        e2 = np.random.choice(np.arange(n_input, n_neurons), 1)
         
         try:
-            edge = net.add_edge(e[0], e[1])
+            edge = net.add_edge(e1, e2)
             edge.values[0] = np.random.choice([w_plus, w_minus], 1)
             edge.values[1] = delay
         except:
