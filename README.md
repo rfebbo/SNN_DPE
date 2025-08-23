@@ -1,7 +1,10 @@
 # Installation:
-cd src
 
-pip install --editable .
+1. clone repository
+
+1. cd SNN_DPE
+
+1. pip install --editable .
 
 # Introduction
 

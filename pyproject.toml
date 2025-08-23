@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=57", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "snn_dpe"
+description = "An exploration of spiking neural networks"
+authors = [
+    {name = "Rocco Febbo", email = "febbo87@gmail.com"},
+    {name = "Manu Rathore"}
+]
+readme = {file = "README.md", content-type = "text/markdown"}
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Information Technology",
+    "Operating System :: POSIX :: Linux",
+    "Topic :: Software Development",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+]
+dynamic = ["version"]
+dependencies = [
+    "numpy",
+    "matplotlib",
+    'networkx',
+    'tqdm',
+    'scipy'
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "snn_dpe.version.__version__"}
+
+[project.urls]
+Homepage = "https://github.com/rfebbo/snn_dpe"
+
+[tool.setuptools.packages.find]
+include = ["snn_dpe*"]
+namespaces = false
