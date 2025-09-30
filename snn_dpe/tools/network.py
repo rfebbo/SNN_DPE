@@ -51,28 +51,32 @@ def run_network(neurons, encoders, enc_input, sim_time):
     # create a 2D array which represents the spike raster
     # where the first dimension is which neuron is spiking
     # and the second dimension is a list of all the times it spiked
-    neuron_fires = []
+    spike_raster = []
     encoder_fires = []
-    for i in range(len(neurons)):
-        neuron_fires.append([])
-
-    for i in range(len(encoders)):
-        encoder_fires.append([])
     
     # simulate
     for t in range(sim_time):
         # if an encoder spikes, call spike on its neuron
+        encoder_fires_at_t = []
         for i, e in enumerate(encoders):
             if e.update():
-                encoder_fires[i].append(t)
+                encoder_fires_at_t.append(1)
                 neurons[i].spike()
+            else:
+                encoder_fires_at_t.append(0)
 
         # update the network
+        neuron_fires_at_t = []
         for i, n in enumerate(neurons):
             if n.update():
-                neuron_fires[i].append(t)
+                neuron_fires_at_t.append(1)
+            else:
+                neuron_fires_at_t.append(0)
 
-    return neuron_fires, encoder_fires
+        spike_raster.append(neuron_fires_at_t)
+        encoder_fires.append(encoder_fires_at_t)
+
+    return spike_raster, encoder_fires
 
 def reset_network(neurons, encoders):
     for n in neurons:
@@ -121,16 +125,16 @@ def find_steady_state(sim_time, attributes, fires, window_size=10):
 # an updated run_network function with early exit condition determined by steady state logic
 def run_network_early_exit(neurons, encoders, enc_input, sim_time, window_size=10):
     # for determing if steady state reached (see next cell)
-    total_fires = []
+    neuron_fires = []
     for i, e in enumerate(encoders):
         e.set_value(enc_input[i])
 
     # simulate
-    fire_matrix = []
+    spike_raster = []
 
     for t in range(sim_time):
-        fire_matrix.append([])
-        total_fires.append(0)
+        spikes_at_t = []
+        total_fires = 0
         # get the input for this timestep, and apply it to input neurons
         for i, e in enumerate(encoders):
             if e.update():
@@ -139,18 +143,21 @@ def run_network_early_exit(neurons, encoders, enc_input, sim_time, window_size=1
         # update the network
         for n in neurons:
             if n.update():
-                fire_matrix[-1].append(1)
-                total_fires[-1] += 1
+                spikes_at_t.append(1)
+                total_fires += 1
             else:
-                fire_matrix[-1].append(0)
+                spikes_at_t.append(0)
+
+        spike_raster.append(spikes_at_t)
+        neuron_fires.append(total_fires)
 
         if t > window_size*2:
-            m1 = np.mean(total_fires[-window_size*2:-window_size])
-            m2 = np.mean(total_fires[-window_size:])
+            m1 = np.mean(neuron_fires[-window_size*2:-window_size])
+            m2 = np.mean(neuron_fires[-window_size:])
             if np.isclose(m1, m2) and m1 != 0:
                 break
 
-    return np.asarray(fire_matrix)
+    return np.asarray(spike_raster)
 
 def save_trained_network(filename, neurons, encoders, dpe_weights, window_size, sim_time, c_acc, E_t, avg_ss):
     network = {}

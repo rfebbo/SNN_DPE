@@ -49,7 +49,7 @@ class Synapse:
 
         # flag for if there is an outgoing spike waiting
         self.spike_queued = False
-        # update tick counter for when to send the spike
+        # update tick counter for when to send the spike based on delay
         self.update_count = 0
 
     def queue_spike(self):

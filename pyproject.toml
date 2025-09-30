@@ -28,7 +28,8 @@ dependencies = [
     "matplotlib",
     'networkx',
     'tqdm',
-    'scipy'
+    'scipy',
+    'ipykernel',
 ]
 
 [tool.setuptools.dynamic]

@@ -13,7 +13,7 @@ class Encoder:
         # the frequency at which the simulation should be running
         self.sim_f = sim_f
 
-    # set this to whatever value the encoder should be representing
+    # set this to a value from 0-1
     def set_value(self, value):
         self.last_fire = 0
         

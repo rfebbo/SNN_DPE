@@ -32,6 +32,7 @@ def plot_iris_data(data, classes, attributes, labels):
         ax_i.legend()
 
 def plot_spike_raster(fire_matrix, print_rates = False):
+    fire_matrix = np.array(fire_matrix)
     n_neurons = len(fire_matrix[0])
 
     fig, ax = plt.subplots(figsize=(10,5))
